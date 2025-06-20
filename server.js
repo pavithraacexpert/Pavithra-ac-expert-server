@@ -6,7 +6,7 @@ const app = express();
 
 // ✅ Allow your Netlify frontend domain
 app.use(cors({
-  origin: 'https://pavithraservices.com/' // ← replace with your actual Netlify URL
+  origin: 'https://pavithraservices.com' // ← replace with your actual Netlify URL
 }));
 
 app.use(express.json());
