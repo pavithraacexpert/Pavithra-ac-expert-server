@@ -3,6 +3,15 @@ const cors = require('cors'); // ← ADD THIS
 const fs = require('fs');
 const path = require('path');
 const app = express();
+const bodyParser = require('body-parser');
+
+require('dotenv').config();
+const twilio = require('twilio');
+
+// Load environment variables
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const fromWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 
 // ✅ Allow your Netlify frontend domain
 app.use(cors({
@@ -14,6 +23,28 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const FEEDBACK_FILE = path.join(__dirname, 'feedback.json');
+
+const client = twilio(accountSid, authToken);
+
+// Replace with the recipient's number
+const toNumber = '+919500109911'; // Include country code
+
+
+app.post('/send-message', async (req, res) => {
+  const { to, body } = req.body;
+
+  try {
+    const message = await client.messages.create({
+      from: fromWhatsAppNumber,
+      to: toNumber,
+      body: body
+    });
+
+    res.json({ success: true, sid: message.sid });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
 
 // Save feedback and keep only the latest 10
 app.post('/submit-feedback', (req, res) => {
