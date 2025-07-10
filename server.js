@@ -62,8 +62,14 @@ app.post('/submit-feedback', (req, res) => {
   feedbacks.push({ name,feedback, rating, date: new Date().toISOString() });
   if (feedbacks.length > 10) feedbacks = feedbacks.slice(-10);
 
-  fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
-  res.json({ success: true, message: 'Feedback saved successfully!' });
+   try {
+    fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
+    console.log("Feedback saved."); // 👈
+    res.json({ success: true, message: 'Feedback saved successfully!' });
+  } catch (err) {
+    console.error("Write error:", err); // 👈
+    res.status(500).json({ success: false, message: 'Could not save feedback', error: err.message });
+  }
 });
 
 // Read all feedbacks
